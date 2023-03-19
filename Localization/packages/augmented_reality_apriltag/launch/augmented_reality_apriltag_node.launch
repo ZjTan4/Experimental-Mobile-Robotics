@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <group ns="$(arg veh)">
+        <node pkg="augmented_reality_apriltag" type="augmented_reality_apriltag_node.py" name="augmented_reality_apriltag_node" output="screen"></node>        
+    </group>
+</launch>

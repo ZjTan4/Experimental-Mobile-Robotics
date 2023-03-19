@@ -1,0 +1,10 @@
+<package>
+    <name> my_packages </name>
+    <version>0.1.0</version>
+    <description>
+        This package is for test purpose
+    </description>
+    <maintainer email="ztan4@ualberta.ca"> Zijie Tan </maintainer>
+    <license>None</license>
+    <buildtool_depend>catkin</buildtool_depend>
+</package>

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="veh"/>
+    <arg name="map_file" default="calibration_pattern"/>
+    <group ns="$(arg veh)">
+        <node pkg="augmented_reality" type="augmented_reality_node.py" name="augmented_reality_node" output="screen" args="$(arg map_file) $(arg veh)"></node>        
+    </group>
+</launch>

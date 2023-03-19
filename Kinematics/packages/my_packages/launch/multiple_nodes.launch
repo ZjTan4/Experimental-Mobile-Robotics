@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<launch>
+    <group ns="$(arg veh)">
+
+        <!-- <node pkg="my_packages" type="my_publisher_node.py" name="my_publisher_node" output="screen"></node>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node" output="screen"></node> -->
+
+        <!-- <node pkg="my_packages" type="my_publisher_node.py" name="my_publisher_node_1" output="screen"></node>
+        <node pkg="my_packages" type="my_publisher_node.py" name="my_publisher_node_2" output="screen"></node> -->
+
+        <!-- <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_1" output="screen">
+            <remap from="~/chatter" to="/$(arg veh)/my_publisher_node_1/chatter"/>
+        </node>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_2" output="screen">
+            <remap from="~/chatter" to="/$(arg veh)/my_publisher_node_2/chatter"/>
+        </node> -->
+
+        <!-- <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_1" output="screen">
+            <remap from="~/chatter" to="my_publisher_node_1/chatter"/>
+        </node>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_2" output="screen">
+            <remap from="~/chatter" to="my_publisher_node_2/chatter"/>
+        </node> -->
+
+        <!-- <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_1" output="screen">
+            <remap from="~/chatter" to="/my_publisher_node_1/chatter"/>
+        </node>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_2" output="screen">
+            <remap from="~/chatter" to="/my_publisher_node_2/chatter"/>
+        </node> -->
+
+        <!-- <remap from="my_subscriber_node_1/chatter/chatter" to="my_publisher_node_1/chatter"/>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_1" output="screen"></node>
+        <remap from="my_subscriber_node_2/chatter/chatter" to="my_publisher_node_2/chatter"/>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_2" output="screen"></node> -->
+
+        <!-- <remap from="~my_subscriber_node_1/chatter/chatter" to="~my_publisher_node_1/chatter"/>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_1" output="screen"></node>
+        <remap from="~my_subscriber_node_2/chatter/chatter" to="~my_publisher_node_2/chatter"/>
+        <node pkg="my_packages" type="my_subscriber_node.py" name="my_subscriber_node_2" output="screen"></node> -->
+
+        <!-- <remap from="led_node/led_pattern" to="led_driver_node/led_pattern"/> -->
+        <node pkg="my_packages" type="led_node.py" name="led_node" output="screen"></node>
+        
+        <!-- <node pkg="my_packages" type="my_camera_subscriber_node.py" name="my_camera_subscriber_node" output="screen"></node> -->
+        <node pkg="my_packages" type="odometry_node.py" name="odometry_node" output="screen"></node>
+        <!-- <node pkg="my_packages" type="odometry_node.py" name="odometry_node" output="screen"></node> -->
+    </group>
+
+</launch>

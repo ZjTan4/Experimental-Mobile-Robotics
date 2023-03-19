@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<package>
+  <name>augmented_reality_apriltag</name>
+  <version>1.0.0</version>
+  <description>The augmented reality package with apriltag</description>
+  <license>GPLv3</license>
+  <maintainer email="ztan4@ualberta.ca">Zijie Tan</maintainer>
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
