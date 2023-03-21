@@ -50,16 +50,16 @@ class DriverNode(DTROS):
                                             self.cb_centers,
                                             queue_size=1)
         # Service
-        service_name = f"/{self.veh}/led_emitter_node/set_custom_pattern"
-        rospy.wait_for_service(service_name)
-        self.sev_led_color = rospy.ServiceProxy(
-            service_name, SetCustomLEDPattern)
+        # service_name = f"/{self.veh}/led_emitter_node/set_custom_pattern"
+        # rospy.wait_for_service(service_name)
+        # self.sev_led_color = rospy.ServiceProxy(
+        #     service_name, SetCustomLEDPattern)
 
         # Util varaibles
         self.jpeg = TurboJPEG()
         self.centers = VehicleCorners()
         self.img = np.empty((480, 640, 3), dtype=np.uint8)
-        self.distance = 0
+        self.distance = float('inf')
         self.counter = 0
         self.last_stop_time = rospy.Time.now()
 
@@ -74,13 +74,15 @@ class DriverNode(DTROS):
             self.offset = 185
 
         self.omega_bound = 4
-        self.last_error = 0
-        self.last_PID_time = rospy.get_time()
+        self.last_trail_error = 0
+        self.last_follow_error = 0
+        self.last_PID_time_trail = rospy.get_time()
+        self.last_PID_time_follow = rospy.get_time()
 
         # Distance
         self.safe_distance = 0.25
         # Velocity
-        self.velocity = 0.15
+        self.velocity = 0.13
 
         # Messages
         self.omega = 0
@@ -97,6 +99,7 @@ class DriverNode(DTROS):
         msg.color_mask = [1, 1, 1, 1, 1]
         msg.frequency = 0.0
         msg.frequency_mask = [0, 0, 0, 0, 0]
+        print(color)
         # self.sev_led_color(msg)
 
     def cb_distance(self, msg: Float32):
@@ -107,7 +110,9 @@ class DriverNode(DTROS):
         if self.centers.detection.data and not msg.detection.data:
             if self.counter <= 10:
                 self.counter += 1
-                return
+                return 
+            else:
+                self.distance = float('inf')
         self.counter = 0
         self.centers = msg
         return
@@ -117,26 +122,33 @@ class DriverNode(DTROS):
         self.img = img
         return
 
-    def PID(self, error):
+    def PID(self, error, trail=False):
         if error is None:
-            self.omega = 2
+            self.omega = 0
         else:
             # P Term
             P = -error * self.P
             # D Term
-            d_error = (error - self.last_error) / \
-                (rospy.get_time() - self.last_PID_time)
-            self.last_error = error
-            self.last_PID_time = rospy.get_time()
+            if trail:
+                d_error = (error - self.last_trail_error) / \
+                    (rospy.get_time() - self.last_PID_time_trail)
+                self.last_trail_error = error
+                self.last_PID_time_trail = rospy.get_time()
+            else:
+                d_error = (error - self.last_follow_error) / \
+                    (rospy.get_time() - self.last_PID_time_follow)
+                self.last_follow_error = error
+                self.last_PID_time_follow = rospy.get_time()
+                
             D = d_error * self.D
             self.omega = min(
                 max((P + D), -self.omega_bound), self.omega_bound)
-            if DEBUG:
-                print("{:.2f} {:.2f} {:.2f} {:.2f} {:.2f}".format(
-                    error, P, D, self.twist.omega, self.twist.v))
+            # if DEBUG:
+            #     print("{:.2f} {:.2f} {:.2f} {:.2f} {:.2f}".format(
+            #         error, P, D, self.twist.omega, self.twist.v))
 
     def lane_detection(self):
-        crop = self.img[300:-1, :, :]
+        crop = self.img[350:-1, :, :]
         crop_width = crop.shape[1]
         hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, ROAD_MASK[0], ROAD_MASK[1])
@@ -167,25 +179,35 @@ class DriverNode(DTROS):
                     cv2.circle(crop, (cx, cy), 7, (0, 0, 255), -1)
             except:
                 self.lane_following_error = None
+                self.last_follow_error = 0
         else:
             self.lane_following_error = None
+            self.last_follow_error = 0
 
     def tail_detection(self):
-        if self.centers.detection.data and self.counter == 0:
+        if self.centers.detection.data:
             points = np.zeros((self.centers.H * self.centers.W, 2))
             for i in range(len(points)):
                 points[i] = np.array(
                     [self.centers.corners[i].x, self.centers.corners[i].y])
             mean_center = points.mean(axis=0)
-            self.taling_error = (mean_center[0] - 320)
+            bound = 100
+            self.taling_error = min(max((mean_center[0] - 320), -bound), bound)
+            # self.taling_error = (mean_center[0] - 320) - abs(self.last_trail_error)
+            # self.taling_error = mean_center[0] - abs(self.last_trail_error)
         else:
             self.taling_error = None
-
+            # self.last_trail_error = 0
+            
     def lane_following(self):
-        self.PID(self.lane_following_error)
+        print(self.lane_following_error, 'lane_following_error')
+        print(self.last_follow_error, 'last_follow_error')
+        self.PID(self.lane_following_error, trail=False)
 
     def tailing(self):
-        self.PID(self.taling_error)
+        print(self.taling_error, 'taling_error')
+        print(self.last_trail_error, 'last_trail_error')
+        self.PID(self.taling_error, trail=True)
 
     def t_intersection(self, rate):
         self.stop(rate)
@@ -237,7 +259,13 @@ class DriverNode(DTROS):
             # start percetion
             perception = self.perception()
             if latest_perception != perception:
-                self.last_error = 0
+                print("CHANGING THE PERCEPTION: ", perception)
+                self.last_follow_error = 0
+                self.last_trail_error = 0
+                
+                self.lane_following_error = 0
+                self.taling_error = 0
+
                 latest_perception = perception
 
             if perception == 1 and rospy.Time.now() - self.last_stop_time > rospy.Duration.from_sec(4.0):
@@ -247,7 +275,7 @@ class DriverNode(DTROS):
                 # tailing
                 self.tail_detection()
                 self.tailing()
-            elif perception == 3:
+            elif perception == 3 and self.distance >= self.safe_distance:
                 # lane following
                 self.lane_detection()
                 self.lane_following()
