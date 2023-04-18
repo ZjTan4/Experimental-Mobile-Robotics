@@ -1,0 +1,35 @@
+{
+    "base_disk_location": "disk_image/dt-nvidia-jetpack-v1.2.2-2gb.zip",
+    "base_disk_name": "dt-nvidia-jetpack-v1.2.2-2gb",
+    "base_disk_version": "1.2.2",
+    "environment": {
+        "commands_version": "daffy",
+        "hostname": "wagon-pad",
+        "init_sd_card_version": "2.1.0",
+        "shell_version": "5.4.5",
+        "user": "justin"
+    },
+    "parameters": {
+        "country": "US",
+        "device": "/dev/sda",
+        "experimental": false,
+        "hostname": "csc22944",
+        "no_cache": false,
+        "no_steps": "",
+        "robot_configuration": "DB21M",
+        "robot_type": "duckiebot",
+        "size": null,
+        "steps": "license,download,flash,verify,setup",
+        "wifi": "DuckieNet:***, DevNet:***",
+        "workdir": "/tmp/duckietown/dts/init_sd_card"
+    },
+    "stamp": 1675466878.9744864,
+    "stamp_human": "2023-02-03T16:27:58.974503",
+    "steps": {
+        "download": true,
+        "flash": true,
+        "license": true,
+        "setup": true,
+        "verify": true
+    }
+}
