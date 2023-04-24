@@ -13,7 +13,7 @@ dt-launchfile-init
 
 # launching app
 
-# dt-exec roslaunch lane_following lane_following_node.launch veh:=$VEHICLE_NAME
+dt-exec roslaunch dwa dwa_node.launch
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
