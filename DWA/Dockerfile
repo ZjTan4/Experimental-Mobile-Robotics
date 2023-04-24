@@ -1,6 +1,6 @@
 # parameters
-ARG REPO_NAME="PID_Controller"
-ARG DESCRIPTION="PID_Controller"
+ARG REPO_NAME="DWA"
+ARG DESCRIPTION="DWA_Planner"
 ARG MAINTAINER="Zijie Tan"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
 ARG ICON="cube"
